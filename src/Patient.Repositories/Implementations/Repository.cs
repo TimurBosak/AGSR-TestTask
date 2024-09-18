@@ -54,8 +54,7 @@ namespace Patient.Repositories.Implementations
             dbSet.Update(entity);
         }
 
-
-        protected virtual IQueryable<T> GetQuery()
+        public IQueryable<T> GetQuery()
         {
             return dbSet;
         }

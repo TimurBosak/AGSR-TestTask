@@ -1,11 +1,7 @@
-﻿using Patient.Domain.Enums;
-
-namespace Patient.Domain.Models
+﻿namespace Patient.API.DTO
 {
-    public class Patient
+    public class PatientDTO
     {
-        public Guid Id { get; set; }
-
         public string Name { get; set; }
 
         public string Surname { get; set; }
@@ -15,5 +11,13 @@ namespace Patient.Domain.Models
         public DateTime BirthDate { get; set; }
 
         public bool Active { get; set; }
+    }
+
+    public enum Gender
+    {
+        male,
+        female,
+        other,
+        unknown
     }
 }
