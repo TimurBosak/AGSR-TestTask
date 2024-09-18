@@ -38,15 +38,6 @@ namespace Patient.Services
             return patients;
         }
 
-        public async Task<IReadOnlyCollection<Domain.Models.Patient>> GetPatiensByConditionAsync(Expression<Func<Domain.Models.Patient, bool>> predicate)
-        {
-            var patientRepository = _uow.GetRepository<Domain.Models.Patient>();
-
-            var patients = await patientRepository.GetWhereAsync(predicate);
-
-            return patients;
-        }
-
         public async Task CreatePatientAsync(Domain.Models.Patient patient)
         {
             var patientRepository = _uow.GetRepository<Domain.Models.Patient>();

@@ -94,5 +94,13 @@ namespace Patient.API.Controllers
 
             return Ok(patient);
         }
+
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAllPatients()
+        {
+            var patients = await _patientService.GetAllPatientsAsync();
+
+            return Ok(patients);
+        }
     }
 }

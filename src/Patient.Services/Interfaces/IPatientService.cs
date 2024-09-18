@@ -10,8 +10,6 @@ namespace Patient.Services.Interfaces
 
         public Task<IReadOnlyCollection<PatientModel>> GetAllPatientsAsync();
 
-        public Task<IReadOnlyCollection<PatientModel>> GetPatiensByConditionAsync(Expression<Func<PatientModel, bool>> predicate);
-
         public Task CreatePatientAsync(PatientModel patient);
 
         public Task CreateMultiplePatientsAsync(IEnumerable<PatientModel> patients);
