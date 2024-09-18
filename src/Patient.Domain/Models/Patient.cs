@@ -1,4 +1,6 @@
-﻿namespace Patient.Domain.Models
+﻿using Patient.Domain.Enums;
+
+namespace Patient.Domain.Models
 {
     public class Patient
     {
@@ -7,6 +9,8 @@
         public string Name { get; set; }
 
         public string Surname { get; set; }
+
+        public Gender Gender { get; set; }
 
         public DateTime BirthDate { get; set; }
 

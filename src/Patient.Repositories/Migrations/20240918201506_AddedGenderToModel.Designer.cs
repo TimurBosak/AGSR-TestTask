@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Patient.Repositories;
 
@@ -11,9 +12,11 @@ using Patient.Repositories;
 namespace Patient.Repositories.Migrations
 {
     [DbContext(typeof(PatientContext))]
-    partial class PatientContextModelSnapshot : ModelSnapshot
+    [Migration("20240918201506_AddedGenderToModel")]
+    partial class AddedGenderToModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
