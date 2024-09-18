@@ -56,7 +56,7 @@ namespace Patient.Repositories.Implementations
 
         public IQueryable<T> GetQuery()
         {
-            return dbSet;
+            return dbSet.AsQueryable();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Patient.Repositories.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Patient.Repositories.Interfaces;
 using Patient.Services.Interfaces;
 using System.Linq.Expressions;
 
@@ -89,6 +90,11 @@ namespace Patient.Services
             patientRepository.Remove(databasePatient);
 
             await _uow.SaveChangesAsync();
+        }
+        
+        public IQueryable<Domain.Models.Patient> GetPatientsQuery()
+        {
+            return _uow.GetRepository<Domain.Models.Patient>().GetQuery();
         }
     }
 }

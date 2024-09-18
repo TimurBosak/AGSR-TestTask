@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Patient.Repositories.Interfaces
 {
@@ -17,5 +18,7 @@ namespace Patient.Repositories.Interfaces
         void Update(T entity);
 
         void Remove(T entity);
+
+        IQueryable<T> GetQuery();
      }
 }
