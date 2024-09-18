@@ -16,7 +16,7 @@ namespace Patient.Services.Interfaces
 
         public Task CreateMultiplePatientsAsync(IEnumerable<PatientModel> patients);
 
-        public Task UpdatePatientAsync(PatientModel patient);
+        public Task UpdatePatientAsync(Guid patientId, PatientModel updatedModel);
 
         public Task DeletePatientAsync(Guid patientId);
     }

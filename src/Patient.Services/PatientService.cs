@@ -65,17 +65,22 @@ namespace Patient.Services
             await _uow.SaveChangesAsync();
         }
 
-        public async Task UpdatePatientAsync(Domain.Models.Patient patient)
+        public async Task UpdatePatientAsync(Guid patientId, Domain.Models.Patient updatedModel)
         {
             var patientRepository = _uow.GetRepository<Domain.Models.Patient>();
-            var databasePatient = await patientRepository.GetByIdAsync(patient.Id);
+            var databasePatient = await patientRepository.GetByIdAsync(patientId);
 
             if (databasePatient == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException("Patient with such id is not existing");
             }
 
-            patientRepository.Update(patient);
+            databasePatient.Name = updatedModel.Name;
+            databasePatient.Surname = updatedModel.Surname;
+            databasePatient.BirthDate = updatedModel.BirthDate;
+            databasePatient.Active = updatedModel.Active;
+
+            patientRepository.Update(databasePatient);
 
             await _uow.SaveChangesAsync();
         }
