@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using PatientModel = Patient.Domain.Models.Patient;
+﻿using PatientModel = Patient.Domain.Models.Patient;
 
 namespace Patient.Services.Interfaces
 
@@ -17,5 +16,7 @@ namespace Patient.Services.Interfaces
         public Task UpdatePatientAsync(Guid patientId, PatientModel updatedModel);
 
         public Task DeletePatientAsync(Guid patientId);
+
+        public IQueryable<PatientModel> GetPatientsQuery();
     }
 }
