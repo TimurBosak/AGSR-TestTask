@@ -6,14 +6,14 @@
 
         public string Surname { get; set; }
 
-        public Gender Gender { get; set; }
+        public GenderDTO Gender { get; set; }
 
         public DateTime BirthDate { get; set; }
 
         public bool Active { get; set; }
     }
 
-    public enum Gender
+    public enum GenderDTO
     {
         male,
         female,
