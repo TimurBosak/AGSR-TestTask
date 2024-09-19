@@ -5,18 +5,18 @@ namespace Patient.Services.Interfaces
 {
     public interface IPatientService
     {
-        public Task<PatientModel> GetPatientByIdAsync(Guid patientId);
+        Task<PatientModel> GetPatientByIdAsync(Guid patientId);
 
-        public Task<IReadOnlyCollection<PatientModel>> GetAllPatientsAsync();
+        Task<IReadOnlyCollection<PatientModel>> GetAllPatientsAsync();
 
-        public Task CreatePatientAsync(PatientModel patient);
+        Task CreatePatientAsync(PatientModel patient);
 
-        public Task CreateMultiplePatientsAsync(IEnumerable<PatientModel> patients);
+        Task CreateMultiplePatientsAsync(IEnumerable<PatientModel> patients);
 
-        public Task UpdatePatientAsync(Guid patientId, PatientModel updatedModel);
+        Task UpdatePatientAsync(Guid patientId, PatientModel updatedModel);
 
-        public Task DeletePatientAsync(Guid patientId);
+        Task DeletePatientAsync(Guid patientId);
 
-        public IQueryable<PatientModel> GetPatientsQuery();
+        Task<IReadOnlyCollection<Domain.Models.Patient>> GetPatientsByDateFilterAsync(DateRangeFilter filter);
     }
 }

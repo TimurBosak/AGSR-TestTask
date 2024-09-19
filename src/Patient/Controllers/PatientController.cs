@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Patient.API.DTO;
+using Patient.Services;
 using Patient.Services.Interfaces;
 using System.Net;
 
@@ -51,7 +52,7 @@ namespace Patient.API.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [HttpPut("UpdatePatient")]
-        public async Task<IActionResult> UpdatePatient(Guid id, string newName, string newSurname, bool newActive, DateTime newBirthDate, Gender newGender)
+        public async Task<IActionResult> UpdatePatient(Guid id, string newName, string newSurname, bool newActive, DateTime newBirthDate, GenderDTO newGender)
         {
             var updatedPatient = new Domain.Models.Patient
             {
@@ -95,6 +96,10 @@ namespace Patient.API.Controllers
             return Ok(patient);
         }
 
+        /// <summary>
+        /// Get's all existing recipients
+        /// </summary>
+        [ProducesResponseType(typeof(IReadOnlyCollection<Domain.Models.Patient>), (int)HttpStatusCode.OK)]
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllPatients()
         {
@@ -103,80 +108,48 @@ namespace Patient.API.Controllers
             return Ok(patients);
         }
 
-        [HttpGet("GetPatients")]
-        public async Task<IActionResult> GetPatients([FromQuery] DateRangeFilterDTO filter)
+        /// <summary>
+        /// Get's patients based on various date filters 
+        /// </summary>
+        /// <param name="filterDto">List of string params which parssed to operator+date/date</param>
+        [ProducesResponseType(typeof(IReadOnlyCollection<Domain.Models.Patient>), (int)HttpStatusCode.OK)]
+        [HttpGet("GetPatientsByDate")]
+        public async Task<IActionResult> GetPatients([FromQuery] DateRangeFilterDTO filterDto)
         {
-            var query = _patientService.GetPatientsQuery().AsQueryable();
+            var filter = new DateRangeFilter();
+            filter.DateFilters = filterDto.DateFilters.Select(f => f).ToList();
+            var patients = await _patientService.GetPatientsByDateFilterAsync(filter);
 
-            foreach (var dateFilter in filter.DateFilters)
-            {
-                if (IsOperator(dateFilter))
-                {
-                    var operatorPart = dateFilter.Substring(0, 2).ToLower();
-                    var datePart = dateFilter.Substring(2);
-
-                    if (DateTime.TryParse(datePart, out var dateValue))
-                    {
-                        switch (operatorPart)
-                        {
-                            case "eq": // Equal
-                                query = query.Where(p => p.BirthDate.Date == dateValue.Date);
-                                break;
-                            case "ne": // Not equal
-                                query = query.Where(p => p.BirthDate.Date != dateValue.Date);
-                                break;
-                            case "lt": // Less than
-                                query = query.Where(p => p.BirthDate < dateValue);
-                                break;
-                            case "gt": // Greater than
-                                query = query.Where(p => p.BirthDate > dateValue);
-                                break;
-                            case "ge": // Greater than or equal
-                                query = query.Where(p => p.BirthDate >= dateValue);
-                                break;
-                            case "le": // Less than or equal
-                                query = query.Where(p => p.BirthDate <= dateValue);
-                                break;
-                            case "sa": // Starts after (exclusive)
-                                query = query.Where(p => p.BirthDate > dateValue);
-                                break;
-                            case "eb": // Ends before (exclusive)
-                                query = query.Where(p => p.BirthDate < dateValue);
-                                break;
-                            case "ap": // Approximately matches (exact date)
-                                query = query.Where(p => p.BirthDate.Date == dateValue.Date);
-                                break;
-                        }
-                    }
-                }
-                else if (dateFilter.Length == 4 && int.TryParse(dateFilter, out var year))
-                {
-                    var startOfYear = new DateTime(year, 1, 1);
-                    var endOfYear = new DateTime(year, 12, 31, 23, 59, 59);
-
-                    query = query.Where(p => p.BirthDate >= startOfYear && p.BirthDate <= endOfYear);
-                }
-                else if (dateFilter.Length == 7)
-                {
-                    var parts = dateFilter.Split('-');
-                    if (parts.Length == 2 && int.TryParse(parts[0], out year) && int.TryParse(parts[1], out var month))
-                    {
-                        var startOfMonth = new DateTime(year, month, 1);
-                        var endOfMonth = new DateTime(year, month, DateTime.DaysInMonth(year, month), 23, 59, 59);
-
-                        query = query.Where(p => p.BirthDate >= startOfMonth && p.BirthDate <= endOfMonth);
-                    }
-                }
-            }
-
-            var patients = query.ToList();
             return Ok(patients);
         }
 
-
-        private bool IsOperator(string dateFilter)
+        /// <summary>
+        /// Create range of patients
+        /// </summary>
+        /// <param name="patients">Collection of DTOs of patients to create</param>
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [HttpPost("CreateRangePatients")]
+        public async Task<IActionResult> AddRangePatients(IEnumerable<PatientDTO> patients)
         {
-            return dateFilter.Length >= 2 && char.IsLetter(dateFilter[0]) && char.IsLetter(dateFilter[1]);
+            var patientsRangeToAdd = new List<Domain.Models.Patient>();
+
+            foreach(var patientDto in patients)
+            {
+                var patient = new Domain.Models.Patient
+                {
+                    Name = patientDto.Name,
+                    Surname = patientDto.Surname,
+                    Active = patientDto.Active,
+                    BirthDate = patientDto.BirthDate,
+                    Gender = (Domain.Enums.Gender)patientDto.Gender
+                };
+
+                patientsRangeToAdd.Add(patient);
+            }
+
+            await _patientService.CreateMultiplePatientsAsync(patientsRangeToAdd);
+
+            return Ok();
         }
     }
 }

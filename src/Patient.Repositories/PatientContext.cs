@@ -16,6 +16,8 @@ namespace Patient.Repositories
             modelBuilder.Entity<Domain.Models.Patient>()
                 .Property(p => p.BirthDate)
                 .IsRequired();
+            modelBuilder.Entity<Domain.Models.Patient>()
+                .HasIndex(i => i.BirthDate);
         }
     }
 }
