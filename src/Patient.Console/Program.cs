@@ -2,8 +2,6 @@
 using Patient.Console;
 using System.Net.Http.Json;
 
-
-
 while (true)
 {
     Console.WriteLine("To create 100 patients click 1!");
@@ -23,7 +21,8 @@ while (true)
         }
 
         var client = new HttpClient();
-        client.BaseAddress = new Uri("https://localhost:7158/");
+        client.BaseAddress = new Uri("http://patientapi:80/");
+        Console.WriteLine(client.BaseAddress);
         var response = await client.PostAsJsonAsync("api/Patient/CreateRangePatients", patientsPayload);
 
         if (response.IsSuccessStatusCode)
@@ -31,7 +30,8 @@ while (true)
             Console.Clear();
             Console.WriteLine("patients added");
         }
-    } else if (answer.Key == ConsoleKey.D2)
+    }
+    else if (answer.Key == ConsoleKey.D2)
     {
         Console.Clear();
         break;

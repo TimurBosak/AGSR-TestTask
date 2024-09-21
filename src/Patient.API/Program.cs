@@ -40,18 +40,22 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var dbContext = services.GetRequiredService<PatientContext>();
-    dbContext.Database.Migrate();
+    try
+    {
+        dbContext.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Database already existing");
+    }
 }
 
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(o =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(o =>
-    {
-        o.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-        o.RoutePrefix = "swagger";
-    });
-}
+    o.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+    o.RoutePrefix = "swagger";
+});
 
 app.UseHttpsRedirection();
 

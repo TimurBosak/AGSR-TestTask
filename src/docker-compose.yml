@@ -1,0 +1,46 @@
+version: '3.4'
+
+services: 
+  patientapi:
+    image: ${DOCKER_REGISTRY-}patientapi
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sql_server2022;Database=PatientDb;User Id=sa;Password=A&VeryComplex123Password;TrustServerCertificate=True;
+    ports:
+      - "8080:80"
+      - "8081:80"
+    depends_on:
+      - sql
+
+  patientconsole:
+    image: ${DOCKER_REGISTRY}patientconsole
+    build:
+      context: ./Patient.Console
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - patientapi
+    stdin_open: true
+    tty: true
+
+  sql:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    container_name: sql_server2022
+    environment: 
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=A&VeryComplex123Password
+    ports:
+      - "1433:1433"
+    healthcheck:
+      test: ["CMD", "sqlcmd", "-S", "localhost", "-U", "sa", "-P", "A&VeryComplex123Password", "-Q", "SELECT 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - dbdata:/var/opt/mssql
+volumes:
+  dbdata:
