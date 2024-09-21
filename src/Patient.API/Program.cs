@@ -36,6 +36,8 @@ builder.Services.AddSwaggerGen(o =>
 
 var app = builder.Build();
 
+Console.WriteLine(app.Environment.IsDevelopment);
+
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

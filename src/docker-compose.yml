@@ -7,8 +7,7 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=sql_server2022;Database=PatientDb;User Id=sa;Password=A&VeryComplex123Password;TrustServerCertificate=True;
+      - ASPNETCORE_ENVIRONMENT=Release
     ports:
       - "8080:80"
       - "8081:80"
@@ -21,7 +20,7 @@ services:
       context: ./Patient.Console
       dockerfile: Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Release
     depends_on:
       - patientapi
     stdin_open: true
@@ -35,11 +34,6 @@ services:
       - SA_PASSWORD=A&VeryComplex123Password
     ports:
       - "1433:1433"
-    healthcheck:
-      test: ["CMD", "sqlcmd", "-S", "localhost", "-U", "sa", "-P", "A&VeryComplex123Password", "-Q", "SELECT 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
     volumes:
       - dbdata:/var/opt/mssql
 volumes:

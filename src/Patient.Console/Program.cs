@@ -2,11 +2,11 @@
 using Patient.Console;
 using System.Net.Http.Json;
 
+Console.WriteLine("To create 100 patients click 1!");
+Console.WriteLine("To exit console app click 2");
+
 while (true)
 {
-    Console.WriteLine("To create 100 patients click 1!");
-    Console.WriteLine("To exit console app click 2");
-
     var answer = Console.ReadKey();
     if (answer.Key == ConsoleKey.D1)
     {
@@ -21,14 +21,20 @@ while (true)
         }
 
         var client = new HttpClient();
-        client.BaseAddress = new Uri("http://patientapi:80/");
-        Console.WriteLine(client.BaseAddress);
+        if (IsRunningInDocker())
+        {
+            client.BaseAddress = new Uri("http://patientapi:80/");
+        }
+        else
+        {
+            client.BaseAddress = new Uri("https://localhost:7158/");
+        }
         var response = await client.PostAsJsonAsync("api/Patient/CreateRangePatients", patientsPayload);
 
         if (response.IsSuccessStatusCode)
         {
-            Console.Clear();
-            Console.WriteLine("patients added");
+            var sourceOfAdding = IsRunningInDocker() ? "from Docker" : "from localhost";
+            Console.WriteLine($"patients added: {sourceOfAdding}");
         }
     }
     else if (answer.Key == ConsoleKey.D2)
@@ -39,3 +45,8 @@ while (true)
 }
 
 Console.WriteLine("Program finished");
+
+static bool IsRunningInDocker()
+{
+    return File.Exists("/proc/1/cgroup") && File.ReadAllText("/proc/1/cgroup").Contains("docker");
+}
