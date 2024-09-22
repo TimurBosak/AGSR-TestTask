@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Patient.Repositories.Interfaces;
 using Patient.Services.Interfaces;
-using System.Linq.Expressions;
 
 namespace Patient.Services
 {

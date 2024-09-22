@@ -2,10 +2,10 @@
 {
     public class RandomPatientGenerator
     {
-        private static string[] names = { "Антон", "Андрей", "Тимур", "Евгений", "Александра", "Виктория", "Марина", "Анастасия" };
-        private static string[] surnames = { "Босак", "Прокопенко", "Коваль", "Можайко", "Шиманович", "Будейко" };
-        private readonly Random gen = new Random();
-        private readonly RandomDateTime dateGenerator = new RandomDateTime();
+        private static readonly string[] names = { "Антон", "Андрей", "Тимур", "Евгений", "Александра", "Виктория", "Марина", "Анастасия" };
+        private static readonly string[] surnames = { "Босак", "Прокопенко", "Коваль", "Можайко", "Шиманович", "Будейко" };
+        private readonly Random generator = new();
+        private readonly RandomDateTime dateGenerator = new ();
 
         public PatientDTO GenerateRandomPatient()
         {
@@ -13,8 +13,8 @@
             {
                 name = GetRandomName(),
                 surname = GetRandomSurname(),
-                active = gen.Next(0, 2) == 1, // Random boolean
-                gender = (Gender)gen.Next(1, 5), // Random enum value from 1 to 4
+                active = generator.Next(0, 2) == 1,
+                gender = (Gender)generator.Next(1, 5),
                 birthDate = dateGenerator.Next(),
             };
 
@@ -23,12 +23,12 @@
 
         private string GetRandomName()
         {
-            return names[gen.Next(names.Length)];
+            return names[generator.Next(names.Length)];
         }
 
         private string GetRandomSurname()
         {
-            return surnames[gen.Next(surnames.Length)];
+            return surnames[generator.Next(surnames.Length)];
         }
     }
 }

@@ -1,0 +1,310 @@
+{
+	"info": {
+		"_postman_id": "1f675cea-516c-42c2-b8e7-51b833797fa0",
+		"name": "PatientApiCollection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12832303"
+	},
+	"item": [
+		{
+			"name": "Patient API",
+			"item": [
+				{
+					"name": "GetPatientsByDate",
+					"item": [
+						{
+							"name": "Equals(eq)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}GetPatientsByDate?DateFilters=eq2020-09",
+									"host": [
+										"{{host}}GetPatientsByDate"
+									],
+									"query": [
+										{
+											"key": "DateFilters",
+											"value": "eq2020-09"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Not equals(ne)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}GetPatientsByDate?DateFilters=ne2017-03-19",
+									"host": [
+										"{{host}}GetPatientsByDate"
+									],
+									"query": [
+										{
+											"key": "DateFilters",
+											"value": "ne2017-03-19"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Lower than(lt)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}GetPatientsByDate?DateFilters=lt2023-07-20",
+									"host": [
+										"{{host}}GetPatientsByDate"
+									],
+									"query": [
+										{
+											"key": "DateFilters",
+											"value": "lt2023-07-20"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Range(lt+gt)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}GetPatientsByDate?DateFilters=lt2023-07-20&DateFilters=gt2020-03-13",
+									"host": [
+										"{{host}}GetPatientsByDate"
+									],
+									"query": [
+										{
+											"key": "DateFilters",
+											"value": "lt2023-07-20"
+										},
+										{
+											"key": "DateFilters",
+											"value": "gt2020-03-13"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Starts after(sa)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}GetPatientsByDate?DateFilters=sa2023-07-20",
+									"host": [
+										"{{host}}GetPatientsByDate"
+									],
+									"query": [
+										{
+											"key": "DateFilters",
+											"value": "sa2023-07-20"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Ends before(eb)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}GetPatientsByDate?DateFilters=eb2022-04-15",
+									"host": [
+										"{{host}}GetPatientsByDate"
+									],
+									"query": [
+										{
+											"key": "DateFilters",
+											"value": "eb2022-04-15"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "CreatePatient",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Timur\",\r\n  \"surname\": \"Bosak\",\r\n  \"gender\": \"male\",\r\n  \"birthDate\": \"2024-09-22T18:10:45.490Z\",\r\n  \"active\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}CreatePatient",
+							"host": [
+								"{{host}}CreatePatient"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdatePatient",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Timur\",\r\n  \"surname\": \"Bosak\",\r\n  \"gender\": \"male\",\r\n  \"birthDate\": \"2024-09-22T18:10:45.490Z\",\r\n  \"active\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localHost}}UpdatePatient/?id=8D6A8487-D04D-494D-52C3-08DCDB2E89DD&newName=updated135&newSurname=updated1&newActive=true&newBirthDate=2023-08-10&newGender=female",
+							"host": [
+								"{{localHost}}UpdatePatient"
+							],
+							"path": [
+								""
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "8D6A8487-D04D-494D-52C3-08DCDB2E89DD"
+								},
+								{
+									"key": "newName",
+									"value": "updated135"
+								},
+								{
+									"key": "newSurname",
+									"value": "updated1"
+								},
+								{
+									"key": "newActive",
+									"value": "true"
+								},
+								{
+									"key": "newBirthDate",
+									"value": "2023-08-10"
+								},
+								{
+									"key": "newGender",
+									"value": "female"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetPatientById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}GetPatientById/8D6A8487-D04D-494D-52C3-08DCDB2E89DD",
+							"host": [
+								"{{host}}GetPatientById"
+							],
+							"path": [
+								"8D6A8487-D04D-494D-52C3-08DCDB2E89DD"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeletePatientById",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}DeletePatientById/6B39B8EE-26F7-4732-52EF-08DCDB2E89DD",
+							"host": [
+								"{{host}}DeletePatientById"
+							],
+							"path": [
+								"6B39B8EE-26F7-4732-52EF-08DCDB2E89DD"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateRangePatients",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n    \"name\": \"Timur\",\r\n    \"surname\": \"Bosak\",\r\n    \"gender\": \"male\",\r\n    \"birthDate\": \"2024-09-22T18:10:45.490Z\",\r\n    \"active\": true\r\n    },\r\n    {\r\n    \"name\": \"David\",\r\n    \"surname\": \"Prokopenko\",\r\n    \"gender\": \"male\",\r\n    \"birthDate\": \"2024-09-22T18:10:45.490Z\",\r\n    \"active\": true\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}CreateRangePatients",
+							"host": [
+								"{{host}}CreateRangePatients"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "localHost",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "hostNameDocker",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

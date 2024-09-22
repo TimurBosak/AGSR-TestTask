@@ -1,7 +1,6 @@
 ﻿using PatientModel = Patient.Domain.Models.Patient;
 
 namespace Patient.Services.Interfaces
-
 {
     public interface IPatientService
     {
