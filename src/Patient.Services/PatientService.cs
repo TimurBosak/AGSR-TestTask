@@ -24,7 +24,7 @@ namespace Patient.Services
 
             if (patient == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException("Patient with such id is not existing");
             }
 
             return patient;
@@ -84,18 +84,22 @@ namespace Patient.Services
 
             if (databasePatient == null)
             {
-                throw new KeyNotFoundException();
+                throw new KeyNotFoundException("Patient with such id is not existing");
             }
 
             patientRepository.Remove(databasePatient);
 
             await _uow.SaveChangesAsync();
         }
-        
+
         public async Task<IReadOnlyCollection<Domain.Models.Patient>> GetPatientsByDateFilterAsync(DateRangeFilter filter)
         {
             var patientRepository = _uow.GetRepository<Domain.Models.Patient>();
             var query = patientRepository.GetQuery();
+            var edgeCaseQuery = patientRepository.GetQuery();
+
+            var startAfterList = new List<DateTime>();
+            var endBeforeList = new List<DateTime>();
 
             foreach (var dateFilter in filter.DateFilters)
             {
@@ -103,27 +107,25 @@ namespace Patient.Services
                 {
                     var operatorPart = dateFilter.Substring(0, 2).ToLower();
                     var datePart = dateFilter.Substring(2);
+                    DateTime dateValue;
 
                     if (datePart.Length == 4 && int.TryParse(datePart, out var year))
                     {
-                        var dateValue = new DateTime(year, 1, 1); // Start of the year
-                        ApplyDateFilter(ref query, operatorPart, dateValue);
+                        dateValue = new DateTime(year, 1, 1);
+                        ApplyDateFilter(ref query, operatorPart, dateValue, startAfterList, endBeforeList);
                     }
                     else if (datePart.Length == 7 && datePart.Contains('-'))
                     {
                         var parts = datePart.Split('-');
                         if (parts.Length == 2 && int.TryParse(parts[0], out year) && int.TryParse(parts[1], out var month) && month >= 1 && month <= 12)
                         {
-                            var dateValue = new DateTime(year, month, 1); // First day of the month
-                            ApplyDateFilter(ref query, operatorPart, dateValue);
+                            dateValue = new DateTime(year, month, 1);
+                            ApplyDateFilter(ref query, operatorPart, dateValue, startAfterList, endBeforeList);
                         }
                     }
-                    else
+                    else if (DateTime.TryParse(datePart, out dateValue))
                     {
-                        if (DateTime.TryParse(datePart, out var dateValue))
-                        {
-                            ApplyDateFilter(ref query, operatorPart, dateValue);
-                        }
+                        ApplyDateFilter(ref query, operatorPart, dateValue, startAfterList, endBeforeList);
                     }
                 }
                 else if (dateFilter.Length == 4 && int.TryParse(dateFilter, out var year))
@@ -144,47 +146,55 @@ namespace Patient.Services
                 }
             }
 
-            var patients = await query.ToListAsync();
+            // If we have any SA or EB in our params update query to respect this
+            if (startAfterList.Count > 0)
+            {
+                query = edgeCaseQuery.Where(p => p.BirthDate > startAfterList.Max());
+            }
 
+            if (endBeforeList.Count > 0)
+            {
+                query = edgeCaseQuery.Where(p => p.BirthDate < endBeforeList.Min());
+            }
+
+            var patients = await query.ToListAsync();
             return patients;
         }
 
 
-        private bool IsOperator(string dateFilter)
+        private static bool IsOperator(string dateFilter)
         {
             return dateFilter.Length >= 2 && char.IsLetter(dateFilter[0]) && char.IsLetter(dateFilter[1]);
         }
 
-        private void ApplyDateFilter(ref IQueryable<Domain.Models.Patient> query, string operatorPart, DateTime dateValue)
+        private static void ApplyDateFilter(ref IQueryable<Domain.Models.Patient> query, string operatorPart, DateTime dateValue, List<DateTime> startAfterList, List<DateTime> endBeforeList)
         {
             switch (operatorPart)
             {
-                case "eq": // Equal
-                    query = query.Where(p => p.BirthDate.Date == dateValue.Date);
+                case "sa":
+                    startAfterList.Add(dateValue);
                     break;
-                case "ne": // Not equal
-                    query = query.Where(p => p.BirthDate.Date != dateValue.Date);
+                case "eb":
+                    endBeforeList.Add(dateValue);
                     break;
-                case "lt": // Less than
-                    query = query.Where(p => p.BirthDate < dateValue);
-                    break;
-                case "gt": // Greater than
+                case "gt":
                     query = query.Where(p => p.BirthDate > dateValue);
                     break;
-                case "ge": // Greater than or equal
+                case "lt":
+                    query = query.Where(p => p.BirthDate < dateValue);
+                    break;
+                case "ge":
                     query = query.Where(p => p.BirthDate >= dateValue);
                     break;
-                case "le": // Less than or equal
+                case "le":
                     query = query.Where(p => p.BirthDate <= dateValue);
                     break;
-                case "sa": // Starts after (exclusive)
-                    query = query.Where(p => p.BirthDate > dateValue);
-                    break;
-                case "eb": // Ends before (exclusive)
-                    query = query.Where(p => p.BirthDate < dateValue);
-                    break;
-                case "ap": // Approximately matches (exact date)
+                case "ap":
+                case "eq":
                     query = query.Where(p => p.BirthDate.Date == dateValue.Date);
+                    break;
+                case "ne":
+                    query = query.Where(p => p.BirthDate.Date != dateValue.Date);
                     break;
             }
         }

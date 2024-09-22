@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Patient.API.DTO;
 using Patient.Services;
@@ -7,16 +8,21 @@ using System.Net;
 
 namespace Patient.API.Controllers
 {
+    /// <summary>
+    /// Controller for crud operations over patient model.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class PatientController : ControllerBase
     {
         private readonly IPatientService _patientService;
+        private readonly IMapper _maper;
 
 
-        public PatientController(IPatientService patientService)
+        public PatientController(IPatientService patientService, IMapper mapper)
         {
             _patientService = patientService;
+            _maper = mapper;
         }
 
         /// <summary>
@@ -27,14 +33,7 @@ namespace Patient.API.Controllers
         [HttpPost("CreatePatient")]
         public async Task<IActionResult> CreatePatient(PatientDTO patientDTO)
         {
-            var patient = new Domain.Models.Patient
-            {
-                Name = patientDTO.Name,
-                Surname = patientDTO.Surname,
-                Active = patientDTO.Active,
-                Gender = (Domain.Enums.Gender)patientDTO.Gender,
-                BirthDate = patientDTO.BirthDate,
-            };
+            var patient = _maper.Map<Domain.Models.Patient>(patientDTO);
 
             await _patientService.CreatePatientAsync(patient);
 
@@ -80,47 +79,70 @@ namespace Patient.API.Controllers
         /// </summary>
         /// <param name="id">The id of patient.</param>
         [ProducesResponseType(typeof(PatientDTO), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [HttpGet("GetPatientById/{id}")]
         public async Task<IActionResult> GetPatientById(Guid id)
         {
-            Domain.Models.Patient patient;
+            PatientDTO patientDto;
             try
             {
-                patient = await _patientService.GetPatientByIdAsync(id);
+                patientDto = _maper.Map<PatientDTO>(await _patientService.GetPatientByIdAsync(id));
             }
             catch (Exception ex)
             {
                 return NotFound(ex.Message);
             }
 
-            return Ok(patient);
+            return Ok(patientDto);
+        }
+
+        /// <summary>
+        /// Delete patinet by id.
+        /// </summary>
+        /// <param name="id">Id of patient.</param>
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [HttpDelete("DeletePatientById/{id}")]
+        public async Task<IActionResult> DeletePatientById(Guid id)
+        {
+            try
+            {
+                await _patientService.DeletePatientAsync(id);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+
+            return Ok();
         }
 
         /// <summary>
         /// Get's all existing recipients
         /// </summary>
-        [ProducesResponseType(typeof(IReadOnlyCollection<Domain.Models.Patient>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IReadOnlyCollection<PatientDTO>), (int)HttpStatusCode.OK)]
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllPatients()
         {
-            var patients = await _patientService.GetAllPatientsAsync();
+            var patientsDto = _maper.Map<List<PatientDTO>>(await _patientService.GetAllPatientsAsync());
 
-            return Ok(patients);
+            return Ok(patientsDto);
         }
 
         /// <summary>
         /// Get's patients based on various date filters 
         /// </summary>
         /// <param name="filterDto">List of string params which parssed to operator+date/date</param>
-        [ProducesResponseType(typeof(IReadOnlyCollection<Domain.Models.Patient>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IReadOnlyCollection<PatientDTO>), (int)HttpStatusCode.OK)]
         [HttpGet("GetPatientsByDate")]
-        public async Task<IActionResult> GetPatients([FromQuery] DateRangeFilterDTO filterDto)
+        public async Task<IActionResult> GetPatientsByDate([FromQuery] DateRangeFilterDTO filterDto)
         {
             var filter = new DateRangeFilter();
             filter.DateFilters = filterDto.DateFilters.Select(f => f).ToList();
-            var patients = await _patientService.GetPatientsByDateFilterAsync(filter);
+            var patientsDto = _maper.Map<List<PatientDTO>>(await _patientService.GetPatientsByDateFilterAsync(filter));
 
-            return Ok(patients);
+            return Ok(patientsDto);
         }
 
         /// <summary>
@@ -135,15 +157,7 @@ namespace Patient.API.Controllers
 
             foreach(var patientDto in patients)
             {
-                var patient = new Domain.Models.Patient
-                {
-                    Name = patientDto.Name,
-                    Surname = patientDto.Surname,
-                    Active = patientDto.Active,
-                    BirthDate = patientDto.BirthDate,
-                    Gender = (Domain.Enums.Gender)patientDto.Gender
-                };
-
+                var patient = _maper.Map<Domain.Models.Patient>(patientDto);
                 patientsRangeToAdd.Add(patient);
             }
 

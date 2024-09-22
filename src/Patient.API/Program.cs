@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Patient.API.Mapping;
 using Patient.Repositories;
 using Patient.Repositories.Implementations;
 using Patient.Repositories.Interfaces;
@@ -19,6 +20,11 @@ builder.Services.AddDbContext<PatientContext>(options =>
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork<PatientContext>>();
 
+builder.Services.AddAutoMapper(config =>
+{
+    config.AddProfile(new AssemblyMappingProfile(Assembly.GetExecutingAssembly()));
+});
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -35,8 +41,6 @@ builder.Services.AddSwaggerGen(o =>
 });
 
 var app = builder.Build();
-
-Console.WriteLine(app.Environment.IsDevelopment);
 
 using (var scope = app.Services.CreateScope())
 {

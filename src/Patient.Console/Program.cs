@@ -34,7 +34,7 @@ while (true)
         if (response.IsSuccessStatusCode)
         {
             var sourceOfAdding = IsRunningInDocker() ? "from Docker" : "from localhost";
-            Console.WriteLine($"patients added: {sourceOfAdding}");
+            Console.WriteLine($" patients added: {sourceOfAdding}");
         }
     }
     else if (answer.Key == ConsoleKey.D2)
