@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Patient.API.DTO;
 using Patient.Services;
@@ -138,8 +137,11 @@ namespace Patient.API.Controllers
         [HttpGet("GetPatientsByDate")]
         public async Task<IActionResult> GetPatientsByDate([FromQuery] DateRangeFilterDTO filterDto)
         {
-            var filter = new DateRangeFilter();
-            filter.DateFilters = filterDto.DateFilters.Select(f => f).ToList();
+            var filter = new DateRangeFilter
+            {
+                DateFilters = filterDto.DateFilters.Select(f => f).ToList()
+            };
+
             var patientsDto = _maper.Map<List<PatientDTO>>(await _patientService.GetPatientsByDateFilterAsync(filter));
 
             return Ok(patientsDto);
